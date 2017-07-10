@@ -5,30 +5,14 @@ import (
 	"fmt"
 	"time"
 	"strings"
-	"strconv"
-	"encoding/json"
 
-	"github.com/toorop/go-pusher"
-	"github.com/alexflint/go-arg"
-	"github.com/logrusorgru/aurora"
 	"github.com/aglyzov/log15"
+	"github.com/logrusorgru/aurora"
+	"github.com/alexflint/go-arg"
+	"github.com/toorop/go-pusher"
 )
 
 const BTCE_PUSHER_APP_KEY = "c354d4d129ee0faa5c92"
-
-type TradeType byte
-const (
-	TRADE_UNK  TradeType = 0
-	TRADE_BID  TradeType = 1 << iota
-	TRADE_ASK
-)
-type Trade struct {
-	Time	time.Time
-	Pair	string
-	Type	TradeType
-	Amount	float64
-	Price	float64
-}
 
 var Log = log15.New("pkg", "btce_ticker")
 
@@ -46,53 +30,6 @@ func InitLoggers(args *Args) {
 	}
 
 	Log.SetHandler(LogHandler)
-}
-
-
-func (typ TradeType) String() string {
-	switch typ {
-	case TRADE_BID: return "BID"
-	case TRADE_ASK: return "ASK"
-	}
-	return "UNK"
-}
-
-func ParseTradeType(typ string) (TradeType, error) {
-	switch strings.ToUpper(typ) {
-	case "ASK", "BUY":  return TRADE_ASK, nil
-	case "BID", "SELL": return TRADE_BID, nil
-	}
-	return TRADE_UNK, fmt.Errorf("unknown trade type %#v", typ)
-}
-
-func DecodeBTCETrades(event *pusher.Event) (trades []*Trade, err error) {
-	type TradeArr [3]string
-	var trades_arr = make([]*TradeArr, 0, 1)
-
-	if err = json.Unmarshal([]byte(event.Data), & trades_arr); err != nil {
-		return
-	}
-
-	for _, trade_arr := range trades_arr {
-		var pair  = strings.ToUpper(strings.Split(event.Channel, ".")[0])
-		pair = strings.Replace(pair, "_", "/", 1)
-		var typ, t_err = ParseTradeType(trade_arr[0]) 
-		if err != nil {return trades, t_err}
-		var amount, a_err = strconv.ParseFloat(trade_arr[2], 64)
-		if err != nil {return trades, a_err}
-		var price, p_err = strconv.ParseFloat(trade_arr[1], 64)
-		if err != nil {return trades, p_err}
-		var trade = & Trade {
-			Time	: time.Now(),
-			Pair	: pair,
-			Type	: typ,
-			Amount	: amount,
-			Price   : price,
-		}
-		trades = append(trades, trade)
-	}
-
-	return
 }
 
 func main() {
