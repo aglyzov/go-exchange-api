@@ -1,4 +1,4 @@
 # exchange-api
-A universal crypto-currency exchange API and a set of command line utilities.
+An API for popular crypto-currency exchanges and a set of command line utilities.
 
-[work in progress]
+*[work in progress]*
