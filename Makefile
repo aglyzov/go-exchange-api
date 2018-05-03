@@ -19,7 +19,7 @@ build:                   # build the crypto-ticker binary
 	@echo "Building"
 	@echo "--------"
 	mkdir -p bin
-	${GO} build -o ./bin/crypto-ticker .
+	${GO} build -o ./bin/ticker ./cmd/ticker
 
 test:                    # test everything
 	@echo "Testing"

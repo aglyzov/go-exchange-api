@@ -1,4 +1,4 @@
-package main
+package ticker
 
 import (
 	"fmt"
@@ -9,11 +9,15 @@ import (
 )
 
 type TradeType byte
+
 const (
-	TRADE_UNK  TradeType = 0
-	TRADE_BID  TradeType = 1 << iota
-	TRADE_ASK
+	UNK_TRADE TradeType = 0
+	BID       TradeType = 1
+	SELL      TradeType = 1
+	ASK       TradeType = 2
+	BUY       TradeType = 2
 )
+
 type Trade struct {
 	Time	time.Time
 	Pair	string
@@ -25,16 +29,16 @@ type Trade struct {
 
 func (typ TradeType) String() string {
 	switch typ {
-	case TRADE_BID: return "BID"
-	case TRADE_ASK: return "ASK"
+	case BID: return "BID"
+	case ASK: return "ASK"
 	}
 	return "UNK"
 }
 
 func ParseTradeType(typ string) (TradeType, error) {
 	switch strings.ToUpper(typ) {
-	case "ASK", "BUY":  return TRADE_ASK, nil
-	case "BID", "SELL": return TRADE_BID, nil
+	case "ASK", "BUY":  return ASK, nil
+	case "BID", "SELL": return BID, nil
 	}
-	return TRADE_UNK, fmt.Errorf("unknown trade type %#v", typ)
+	return UNK_TRADE, fmt.Errorf("unknown trade type %#v", typ)
 }
